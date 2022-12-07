@@ -42,10 +42,22 @@ public class SecurityConfig {
 ## ant pattern 을 이용한 ignore 처리 권장되지 않음 ##
     - WARN 로그가 발생
     - 이 로그는 Spring Security 5.5.x 에 추가되었다.
-````
-You are asking Spring Security to ignore Ant [pattern='/resource/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
-````
     - 추가로 리소스에 대해서 SecurityContext 를 세션에서 찾는것을 방지하여 성능 최적화 방법을 유지하려면 Resource 용 SecurityFilterChain 을 추가하는 방법을 제시
 
-
-
+1. Resource 용 SecurityFilterChain 적용
+    - WebSecurityCustomizer 설정을 제거하며 @Order(0)을 추가하여 먼저 FilterChain을 타도록 지정
+    - resources(css, js 등) 의 경우 securityContext 등에 대한 조회가 불필요 하므로 disable
+````java
+@Bean
+@Order(0)
+public SecurityFilterChain resources(HttpSecurity http) throws Exception {
+  return http.requestMatchers(matchers -> matchers
+      .antMatchers("/resources/**"))
+    .authorizeHttpRequests(authorize -> authorize
+      .anyRequest().permitAll())
+    .requestCache(RequestCacheConfigurer::disable)
+    .securityContext(AbstractHttpConfigurer::disable)
+    .sessionManagement(AbstractHttpConfigurer::disable)
+    .build();
+}
+````
