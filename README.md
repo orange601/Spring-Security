@@ -2,8 +2,13 @@
 :leaves: Spring-Security 안전하게 사용하기
 - https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter
 
-# 개념 공부하기
-- https://velog.io/@kai6666/Spring-%EC%8A%A4%ED%94%84%EB%A7%81-%EC%8B%9C%ED%81%90%EB%A6%AC%ED%8B%B0Spring-Security-%EA%B8%B0%EB%B3%B8-%EA%B0%9C%EB%85%90%EA%B3%BC-%EA%B5%AC%EC%A1%B0
+## CORS 정책 ##
+- 모질라 문서 
+- CORS란 HTTP헤더에 기반한 매카니즘이다. 
+- 서버가 다른 origin의 브라우저에게자신의 자원이 로드될 수 있도록 헤더에 표시해주는 방법이다. 
+- 이 과정을 위해 브라우저는 preflight요청을먼저 보내 자신이 요청할 수 있는 메소드와 origin을 확인한다. 
+- 또한 axios와 같이 XMLHttpRequest를 사용한다면 기본적으로 same-origin에 대해서만 브라우저가 올바른 서버로 간주하기 때문에 Access-Control-Allow-Origin헤더가 적절하게 set되어 있어야 한다. 
+
 
 ## @EnableWebSecurity ##
 1. Spring Boot 를 사용하고 있을 경우 SecurityAutoConfiguration 에서 import 되는 WebSecurityEnablerConfiguration 에 의해 자동으로 세팅 되므로 추가하지 않아도 된다.
@@ -65,3 +70,7 @@ public SecurityFilterChain resources(HttpSecurity http) throws Exception {
     .build();
 }
 ````
+
+
+### 개념 공부하기 ###
+- https://velog.io/@kai6666/Spring-%EC%8A%A4%ED%94%84%EB%A7%81-%EC%8B%9C%ED%81%90%EB%A6%AC%ED%8B%B0Spring-Security-%EA%B8%B0%EB%B3%B8-%EA%B0%9C%EB%85%90%EA%B3%BC-%EA%B5%AC%EC%A1%B0
