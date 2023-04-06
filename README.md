@@ -4,11 +4,13 @@
 
 ## CORS 정책 ##
 - 아래는 [모질라 문서](https://developer.mozilla.org/ko/docs/Web/HTTP/CORS) 내용이다.
-- CORS란 HTTP헤더에 기반한 매카니즘이다. 
-- 서버가 다른 origin의 브라우저에게자신의 자원이 로드될 수 있도록 헤더에 표시해주는 방법이다. 
-- 이 과정을 위해 브라우저는 preflight요청을먼저 보내 자신이 요청할 수 있는 메소드와 origin을 확인한다. 
-- 또한 axios와 같이 XMLHttpRequest를 사용한다면 기본적으로 same-origin에 대해서만 브라우저가 올바른 서버로 간주하기 때문에 Access-Control-Allow-Origin헤더가 적절하게 set되어 있어야 한다. 
-
+- 브라우저는 현재 웹페이지 이외의 사이트에 xhr(ajax, axios..) 요청할 때 CORS preflight 라는 요청을 보낸다. 
+- 이 것은 실제 해당 서버에 CORS 정책을 확인하기 위한 요청이며 OPTIONS 메소드를 사용하여 요청을 보낸다.
+- (GET /hello 요청에 대해 OPTIONS /hello 요청을 preflight로 보낸다)
+- 이 OPTIONS 요청은 웹페이지의 javascript에 의한 명시적인 요청이 아니라, 브라우저가 보내는 요청이다. 
+- 이 요청의 응답으로 적절한 CORS 접근 권한을 얻지 못하면 브라우저는 그 사이트에 대한 xhr 요청을 모두 무시한다.
+- (실제 서버응답을 javascript로 돌려주지 않는다.)
+- [출처](https://oddpoet.net/blog/2017/04/27/cors-with-spring-security/)
 
 ## @EnableWebSecurity ##
 1. Spring Boot 를 사용하고 있을 경우 SecurityAutoConfiguration 에서 import 되는 WebSecurityEnablerConfiguration 에 의해 자동으로 세팅 되므로 추가하지 않아도 된다.
