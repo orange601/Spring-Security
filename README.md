@@ -3,7 +3,7 @@
 - https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter
 
 ## CORS 정책 ##
-- 모질라 문서 
+- 모질라 문서 내용이다.
 - CORS란 HTTP헤더에 기반한 매카니즘이다. 
 - 서버가 다른 origin의 브라우저에게자신의 자원이 로드될 수 있도록 헤더에 표시해주는 방법이다. 
 - 이 과정을 위해 브라우저는 preflight요청을먼저 보내 자신이 요청할 수 있는 메소드와 origin을 확인한다. 
