@@ -4,7 +4,7 @@
 
 ## Legacy Security Config ##
 - 기존에 많이 사용하던 Security Config에는 문제점이 몇가지 있다.
-1. EnableWebSecurity
+1. @EnableWebSecurity
     + Springboot에서는 자동으로 생성됨 @EnableWebSecurity 추가할 필요없음.
 2. ant pattern 을 이용한 ignore 처리 권장되지 않음
 3. Indent 문제
