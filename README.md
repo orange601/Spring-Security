@@ -59,6 +59,24 @@ class WebSecurityEnablerConfiguration {
 ### 2. ant pattern을 이용한 ignore처리 권장되지 않음 ###
 - 해당 설정으로 실행시 하단과 같은 WARN 로그가 발생한다.
 
+````
+You are asking Spring Security to ignore Ant [pattern='/resources/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+````
+
+- 이 로그는 Spring Security 5.5.x 에 추가되었다.
+- [Spring Security GitHub Issue](https://github.com/spring-projects/spring-security/issues/10938) 에서 그 이유에 대해 답변을 확인할 수 있다.
+
+간단히 정리해보자면 다음과 같다.
+
+````
+web.ignoring() 은 Spring Security 가 해당 엔드포인트에 보안 헤더 또는 기타 보호 조치를 제공할 수
+없음을 의미한다. 따라서 authorizeHttpRequests permitAll 을 사용 할 경우 권한은 검증하지 않으면서
+요청을 보호 할수 있으므로 권장된다.
+
+추가로 리소스에 대해서 SecurityContext 를 세션에서 찾는것을 방지하여 성능 최적화 방법을 유지하려면
+Resource 용 SecurityFilterChain 을 추가하는 방법을 제시하였다.
+````
+
 
 
 ## Security Config ##
