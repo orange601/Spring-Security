@@ -39,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ````
 
-### 1. EnableWebSecurity ###
+### 1. @EnableWebSecurity ###
 - 간혹 @EnableWebSecurity를 추가하는 경우가 있다. 
 - 만약 Spring Boot 를 사용하고 있디면
 - SecurityAutoConfiguration에서 import 되는 WebSecurityEnablerConfiguration에 의해 자동으로 세팅 된다.
