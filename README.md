@@ -105,6 +105,10 @@ http.csrf().disable()
 - [Spring Blog, Spring Security without the WebSecurityConfigurerAdapter](https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter) 에서 확인 가능하다.
 
 
+
+---------------------------------------------------------------------------------------------
+
+
 ## Legacy Security Config 해결방법 ##
 
 ### 1. WebSecurityConfigurerAdapter ###
