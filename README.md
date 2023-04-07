@@ -2,6 +2,69 @@
 :leaves: Spring-Security 안전하게 사용하기
 - https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter
 
+## Legacy Security Config ##
+- 기존에 많이 사용하던 Security Config에는 문제점이 몇가지 있다.
+1. EnableWebSecurity
+    + Springboot에서는 자동으로 생성됨 @EnableWebSecurity 추가할 필요없음.
+2. ant pattern 을 이용한 ignore 처리 권장되지 않음
+3. Indent 문제
+4. 5.7.X 부터 WebSecurityConfigurerAdapter Deprecate
+
+````java
+// 기존에 많이 사용하던 Security Config
+@EnableWebSecurity  // Spring Security 활성화
+@Configuration
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+  @Override
+  public void configure(WebSecurity web) {
+    web.ignoring().antMatchers("/resources/**"); // resource 에 대해 Spring Security FilterChain 제외
+  }
+  
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http.csrf().disable()
+        .headers()  // 보안 헤더 설정
+          .frameOptions().disable().and()
+        .authorizeRequests()  // 권한 검증 설정
+          .antMatchers("/user/**").hasRole("USER")
+          .anyRequest().authenticated().and()
+        .formLogin()
+          .loginPage("/user/login").permitAll()
+          .defaultSuccessUrl("/index").and()
+        .logout()
+          .logoutUrl("/user/logout");
+  }
+
+}
+````
+
+### 1. EnableWebSecurity ###
+- 간혹 @EnableWebSecurity를 추가하는 경우가 있다. 
+- 만약 Spring Boot 를 사용하고 있디면
+- SecurityAutoConfiguration에서 import 되는 WebSecurityEnablerConfiguration에 의해 자동으로 세팅 된다.
+
+````java
+@Configuration(proxyBeanMethods = false)
+@ConditionalOnMissingBean(name = BeanIds.SPRING_SECURITY_FILTER_CHAIN)
+@ConditionalOnClass(EnableWebSecurity.class)
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+@EnableWebSecurity
+class WebSecurityEnablerConfiguration {
+    ...
+}
+````
+
+
+
+
+## Security Config ##
+1. WebSecurityConfigurerAdapter 상속 제거
+2. Lambda DSL 적용
+3. Resource Filter Chain 설정
+
+
+
 ## CORS 정책 ##
 - 아래는 [모질라 문서](https://developer.mozilla.org/ko/docs/Web/HTTP/CORS) 내용이다.
 - 브라우저는 현재 웹페이지 이외의 사이트에 xhr(ajax, axios..) 요청할 때 CORS preflight 라는 요청을 보낸다. 
