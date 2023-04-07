@@ -221,6 +221,44 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
 - Disable 설정에 대해서 Method Reference 적용 하였으며 Lambda DSL 을 통해 명확한 Indent 구분이 되는것이 장점이다.
 - 추가로 각 Configurer 에서 모든 설정을 진행한 후에 HttpSecurity 를 반환하므로 체이닝을 위해 명시적으로 and() 를 호출하지 않아도 된다.
 
+
+## 리팩토링된 Java Config ##
+````java
+@Configuration
+public class SecurityConfig {
+
+  @Bean
+  @Order(0)
+  public SecurityFilterChain resources(HttpSecurity http) throws Exception {
+    return http.requestMatchers(matchers -> matchers
+            .antMatchers("/resources/**"))
+        .authorizeHttpRequests(authorize -> authorize
+            .anyRequest().permitAll())
+        .requestCache(RequestCacheConfigurer::disable)
+        .securityContext(AbstractHttpConfigurer::disable)
+        .sessionManagement(AbstractHttpConfigurer::disable)
+        .build();
+  }
+
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    return http.csrf(AbstractHttpConfigurer::disable)
+        .headers(headers -> headers
+            .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+        .authorizeRequests(authorize -> authorize
+            .antMatchers("/user").hasRole("USER")
+            .anyRequest().authenticated())
+        .formLogin(form -> form
+            .loginPage("/user/login").permitAll()
+            .defaultSuccessUrl("/index"))
+        .logout(logout -> logout
+            .logoutUrl("/user/logout"))
+        .build();
+  }
+
+}
+````
+
 ## CORS 정책 ##
 - 아래는 [모질라 문서](https://developer.mozilla.org/ko/docs/Web/HTTP/CORS) 내용이다.
 - 브라우저는 현재 웹페이지 이외의 사이트에 xhr(ajax, axios..) 요청할 때 CORS preflight 라는 요청을 보낸다. 
