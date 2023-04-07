@@ -6,10 +6,14 @@
 - 기존에 많이 사용하던 Security Config에는 문제점이 몇가지 있다.
 1. [@EnableWebSecurity](#1-EnableWebSecurity)
     + Springboot에서는 자동으로 생성됨 @EnableWebSecurity 추가할 필요없음.
+
 2. [ant pattern 을 이용한 ignore 처리 권장되지 않음](#2-ant-pattern을-이용한-ignore처리-권장되지-않음)
 
-3. Indent 문제
-4. 5.7.X 부터 WebSecurityConfigurerAdapter Deprecate
+3. [Indent 문제(들여쓰기)](#3-Indent-문제)
+    + 들여쓰기로 인하여 가독성과 사람마다 통일성 문제가 발생
+
+4. [4. WebSecurityConfigurerAdapter Deprecate](#4-WebSecurityConfigurerAdapter-Deprecate) 
+    + 5.7.X 부터 WebSecurityConfigurerAdapter Deprecate
 
 ````java
 // 기존에 많이 사용하던 Security Config
@@ -77,6 +81,28 @@ web.ignoring() 은 Spring Security 가 해당 엔드포인트에 보안 헤더 �
 Resource 용 SecurityFilterChain 을 추가하는 방법을 제시하였다.
 ````
 
+### 3. Indent 문제 ###
+- 현재 설정의 경우 Configurer 에 disable() 를 호출하지 않을 경우 체이닝을 위해 and() 를 호출해야 한다.
+- 또한 가독성을 위해 들여쓰기를 하고 있지만 명확히 구분되지 않아 작성하는 사람마다 다르게 할 여지가 있다.
+
+````java
+http.csrf().disable()
+    .headers()
+      .frameOptions().disable().and() // HeadersConfigurer 의 disable() 이 아니기때문에 and() 호출해야 한다.
+    .authorizeRequests()
+      .antMatchers("/user/**").hasRole("USER")  // 가독성을 위해선 들여쓰기를 해야하나 명확하지 않다.
+      .anyRequest().authenticated().and()
+    .formLogin()
+    .loginPage("/user/login").permitAll() // 들여쓰기를 안할 경우 가독성이 좋지 않다.
+      .defaultSuccessUrl("/index").and()
+    .logout()
+      .logoutUrl("/user/logout");
+````
+
+### 4. WebSecurityConfigurerAdapter Deprecate ###
+- 현재 Spring Boot 2.6.7 기준 Spring Security 5.6.3 을 사용하고 있다
+- 하지만만 추후 5.7.X 부터 WebSecurityConfigurerAdapter 가 Deprecate 될 예정이다.
+- [Spring Blog, Spring Security without the WebSecurityConfigurerAdapter](https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter) 에서 확인 가능하다.
 
 
 ## Security Config ##
