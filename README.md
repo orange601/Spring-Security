@@ -197,10 +197,8 @@ public SecurityFilterChain resources(HttpSecurity http) throws Exception {
 
 
 ### 3. Lambda DSL 적용하여 Indent 문제 해결 ###
-Spring Security 5.2.X 부터 Lambda DSL 이 추가되었습니다.
-이는 보안 필터 설정을 담당하는 Configurer 에 대해 Lambda 형식으로 작성할 수 있도록 지원합니다.
-
-위에서 선언한 Security 설정의 각 Configurer 에 대해 적용하면 하단과 같습니다.
+- Spring Security 5.2.X 부터 Lambda DSL 이 추가되었다.
+- 이는 보안 필터 설정을 담당하는 Configurer 에 대해 Lambda 형식으로 작성할 수 있도록 지원한다.
 
 ````java
 @Bean
@@ -220,7 +218,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
 }
 ````
 
--Disable 설정에 대해서 Method Reference 적용 하였으며 Lambda DSL 을 통해 명확한 Indent 구분이 되는것이 장점이다.
+- Disable 설정에 대해서 Method Reference 적용 하였으며 Lambda DSL 을 통해 명확한 Indent 구분이 되는것이 장점이다.
 - 추가로 각 Configurer 에서 모든 설정을 진행한 후에 HttpSecurity 를 반환하므로 체이닝을 위해 명시적으로 and() 를 호출하지 않아도 된다.
 
 ## CORS 정책 ##
