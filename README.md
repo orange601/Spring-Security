@@ -105,6 +105,59 @@ http.csrf().disable()
 - [Spring Blog, Spring Security without the WebSecurityConfigurerAdapter](https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter) 에서 확인 가능하다.
 
 
+#### 해결방법 ####
+- WebSecurityConfigurerAdapter 상속 제거
+- SecurityFilterChain 를 Bean 으로 선언하는 방법이 있다.
+- 이때 HttpSecurity 를 주입받아 사용하면 된다.
+
+````java
+@Configuration
+public class SecurityConfig {
+
+  @Bean
+  public WebSecurityCustomizer webSecurityCustomizer() {
+    return web -> web.ignoring().antMatchers("/resources/**");
+  }
+
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    return http.csrf().disable()
+        .headers()
+          .frameOptions().disable().and()
+        .authorizeRequests()
+          .antMatchers("/user/**").hasRole("USER")
+          .anyRequest().authenticated().and()
+        .formLogin()
+          .loginPage("/user/login").permitAll()
+          .defaultSuccessUrl("/index").and()
+        .logout()
+          .logoutUrl("/user/logout").and()
+        .build();
+  }
+
+}
+````
+
+- 코드 자체는 크게 변경된것은 없다.
+- WebSecurityConfigurerAdapter 상속을 제거하고 WebSecurityCustomizer 선언과 HttpSecurity 의 build() 를 호출후 리턴하여 Bean 으로 등록하면 된다.
+- HttpSecurityConfiguration 을 확인해보면 HttpSecurity 에 기본적인 설정을 한후 prototype 으로Bean 을 설정하고 있다. 
+- 따라서 매번 주입 받을때마다 새로운 인스턴스를 주입받을 수 있다.
+
+**주의사항**
+- WebSecurityConfigurerAdapter 상속과 SecurityFilterChain Bean 을 동시에 사용할 경우 하단과 같은 로그가 발생하며 어플리케이션 시작에 실패하게된다.
+
+````java
+Caused by: java.lang.IllegalStateException: Found WebSecurityConfigurerAdapter as well as SecurityFilterChain. Please select just one.
+	at org.springframework.util.Assert.state(Assert.java:76) ~[spring-core-5.3.19.jar:5.3.19]
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration.springSecurityFilterChain(WebSecurityConfiguration.java:107) ~[spring-security-config-5.6.3.jar:5.6.3]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566) ~[na:na]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:154) ~[spring-beans-5.3.19.jar:5.3.19]
+	... 22 common frames omitted
+````
+
 ## Security Config ##
 1. WebSecurityConfigurerAdapter 상속 제거
 2. Lambda DSL 적용
