@@ -101,7 +101,7 @@ http.csrf().disable()
 
 ### 4. WebSecurityConfigurerAdapter Deprecate ###
 - 현재 Spring Boot 2.6.7 기준 Spring Security 5.6.3 을 사용하고 있다
-- 하지만만 추후 5.7.X 부터 WebSecurityConfigurerAdapter 가 Deprecate 될 예정이다.
+- 하지만 추후 5.7.X 부터 WebSecurityConfigurerAdapter 가 Deprecate 될 예정이다.
 - [Spring Blog, Spring Security without the WebSecurityConfigurerAdapter](https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter) 에서 확인 가능하다.
 
 
