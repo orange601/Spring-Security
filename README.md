@@ -105,9 +105,12 @@ http.csrf().disable()
 - [Spring Blog, Spring Security without the WebSecurityConfigurerAdapter](https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter) 에서 확인 가능하다.
 
 
-#### 해결방법 ####
+## Legacy Security Config 해결방법 ##
+
+### 1. WebSecurityConfigurerAdapter ###
+
 - WebSecurityConfigurerAdapter 상속 제거
-- SecurityFilterChain 를 Bean 으로 선언하는 방법이 있다.
+- SecurityFilterChain 를 Bean 으로 선언한다.
 - 이때 HttpSecurity 를 주입받아 사용하면 된다.
 
 ````java
@@ -143,7 +146,7 @@ public class SecurityConfig {
 - HttpSecurityConfiguration 을 확인해보면 HttpSecurity 에 기본적인 설정을 한후 prototype 으로Bean 을 설정하고 있다. 
 - 따라서 매번 주입 받을때마다 새로운 인스턴스를 주입받을 수 있다.
 
-**주의사항**
+#### 주의사항 ####
 - WebSecurityConfigurerAdapter 상속과 SecurityFilterChain Bean 을 동시에 사용할 경우 하단과 같은 로그가 발생하며 어플리케이션 시작에 실패하게된다.
 
 ````java
@@ -157,13 +160,64 @@ Caused by: java.lang.IllegalStateException: Found WebSecurityConfigurerAdapter a
 	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:154) ~[spring-beans-5.3.19.jar:5.3.19]
 	... 22 common frames omitted
 ````
+- 따라서 둘중 한가지만 사용하도록 해야하며 명시적으로 WebSecurityConfigurerAdapter 를 선언하지 않았으나
+- 로그가 발생한다면 로그 발생지점을 디버깅하여 어디서 등록된것인지 확인 해보시는걸 추천한다.
 
-## Security Config ##
-1. WebSecurityConfigurerAdapter 상속 제거
-2. Lambda DSL 적용
-3. Resource Filter Chain 설정
+````
+제 경험으론 지금은 Deprecate 된 Spring Security OAuth2 Resource Server 와
+SecurityFilterChain Bean 를 함께 사용시 Resource Server 가 내부에서 WebSecurityConfigurerAdapter 를
+사용 하고 있어 해당 이슈를 접한적이 있습니다.
+````
+출처: https://velog.io/@csh0034/Spring-Security-Config-Refactoring
+
+### 2. Resource 용 SecurityFilterChain 적용 ###
+- WebSecurityCustomizer 설정을 제거하며 하단과 같이 @Order(0) 을 추가하여 먼저 FilterChain 을 타도록 지정한다.
+- resources(css, js 등) 의 경우 securityContext 등에 대한 조회가 불필요 하므로 disable 한다.
+
+````java
+@Bean
+@Order(0)
+public SecurityFilterChain resources(HttpSecurity http) throws Exception {
+  return http.requestMatchers(matchers -> matchers
+      .antMatchers("/resources/**"))
+    .authorizeHttpRequests(authorize -> authorize
+      .anyRequest().permitAll())
+    .requestCache(RequestCacheConfigurer::disable)
+    .securityContext(AbstractHttpConfigurer::disable)
+    .sessionManagement(AbstractHttpConfigurer::disable)
+    .build();
+}
+````
+- 여기서 authorizeHttpRequests 은 기존에 사용하는 authorizeRequests 와 다른 설정이다.
+- 이번 글에선 5.6.1 버전부터 authorizeHttpRequests(AuthorizationFilter)가 authorizeRequests(FilterSecurityInterceptor)를 대체한다 정도로만 정리하겠다.
 
 
+### 3. Lambda DSL 적용하여 Indent 문제 해결 ###
+Spring Security 5.2.X 부터 Lambda DSL 이 추가되었습니다.
+이는 보안 필터 설정을 담당하는 Configurer 에 대해 Lambda 형식으로 작성할 수 있도록 지원합니다.
+
+위에서 선언한 Security 설정의 각 Configurer 에 대해 적용하면 하단과 같습니다.
+
+````java
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  return http.csrf(AbstractHttpConfigurer::disable)
+      .headers(headers -> headers
+          .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+      .authorizeRequests(authorize -> authorize
+          .antMatchers("/user").hasRole("USER")
+          .anyRequest().authenticated())
+      .formLogin(form -> form
+          .loginPage("/user/login").permitAll()
+          .defaultSuccessUrl("/index"))
+      .logout(logout -> logout
+          .logoutUrl("/user/logout"))
+      .build();
+}
+````
+
+-Disable 설정에 대해서 Method Reference 적용 하였으며 Lambda DSL 을 통해 명확한 Indent 구분이 되는것이 장점이다.
+- 추가로 각 Configurer 에서 모든 설정을 진행한 후에 HttpSecurity 를 반환하므로 체이닝을 위해 명시적으로 and() 를 호출하지 않아도 된다.
 
 ## CORS 정책 ##
 - 아래는 [모질라 문서](https://developer.mozilla.org/ko/docs/Web/HTTP/CORS) 내용이다.
