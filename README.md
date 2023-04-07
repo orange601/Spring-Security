@@ -12,6 +12,37 @@
 - (실제 서버응답을 javascript로 돌려주지 않는다.)
 - [출처](https://oddpoet.net/blog/2017/04/27/cors-with-spring-security/)
 
+
+````java
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+        	.csrf() // csrf: 쿠키를 기반으로 한 인증 방식일 때 사용되는 공격방식 // CSRF 토큰 방식을 사용해서 인증을 진행필요
+        		.disable()  // REST API 방식을 사용할 때는 쿠키를 사용해서 인증하는 방식을 잘 사용하지 않기에 설정을 꺼두어도 무방하다.
+        	.cors()
+        		.configurationSource(corsConfigurationSource());
+        return http.build();
+    }
+    
+    
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowCredentials(false); // cross origin 으로부터 인증을 위한 쿠키 정보를 받을지 여부
+        configuration.setAllowedOrigins(Arrays.asList("*")); // 허용할 origin 정보
+        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT")); // 허용할 http methods.
+        // configuration.addAllowedMethod(HttpMethod.GET); // add 메서드는 하나만 등록할때 사용한다.
+
+        configuration.addAllowedHeader("*");
+        // configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+
+    }
+````
+
 ## @EnableWebSecurity ##
 1. Spring Boot 를 사용하고 있을 경우 SecurityAutoConfiguration 에서 import 되는 WebSecurityEnablerConfiguration 에 의해 자동으로 세팅 되므로 추가하지 않아도 된다.
 
