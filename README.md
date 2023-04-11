@@ -3,8 +3,8 @@
 - https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter
 
 ## DelegatingFilterProxy ##
-- Spring Security는 사용하고자 하는 FilterChain들을 Servlet Container 기반의 필터 위에서 동작시키기 위해 DelegatingFilterProxy라는 클래스를 이용
-- DelegatingFilterProxy는 IOC 컨테이너에서 관리하는 빈이 아닌 표준 서블릿 필터를 구현하고 있으며 내부에 위임대상(FilterChainProxy)을 갖고있다.
+- FilterChain들을 Servlet Container 기반의 필터 위에서 동작시키기 위해 DelegatingFilterProxy라는 클래스를 사용한다.
+- 서블릿 필터는 스프링에서 정의된 빈을 주입해서 사용할 수 없다.
 - 표준 서블릿 컨테이너와 Spring IOC 컨테이너의 다리 역할을 한다고 생각하면된다.
 - FilterChain은 Servlet Container가 관리하는 ApplicationFilterChain이다. SecurityFilterChain과는 다르다.
 - DelegatingFilterProxy는 서블릿 필터이다.
