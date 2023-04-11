@@ -10,6 +10,7 @@
 - DelegatingFilterProxy는 서블릿 필터이다.
 - Spring IOC 컨테이가 관리는 Filter Bean을 갖고 있고, Filter Bean은 FilterChainProxy이며 이 객체안에서 Security와 관련된 일들이 벌어진다고 생각할 수 있다.
 
+![images_yaho1024_post_0dc7723f-7e9e-4255-aff3-c1d3714a277a_delegatingfilterproxy](https://user-images.githubusercontent.com/24876345/231084021-9a61dab5-a14f-415c-b370-3470ed4273f6.png)
 
 
 
