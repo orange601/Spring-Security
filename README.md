@@ -1,17 +1,28 @@
 # Spring-Security
 :leaves: Spring-Security 안전하게 사용하기
-- https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter
+- Spring-Security는 필터의 생명주기를 이용해서 인증과 권한 작업을 수행한다.
 
-## DelegatingFilterProxy ##
-- FilterChain들을 Servlet Container 기반의 필터 위에서 동작시키기 위해 DelegatingFilterProxy라는 클래스를 사용한다.
-- 서블릿 필터는 스프링에서 정의된 빈을 주입해서 사용할 수 없다.
-- 표준 서블릿 컨테이너와 Spring IOC 컨테이너의 다리 역할을 한다고 생각하면된다.
-- FilterChain은 Servlet Container가 관리하는 ApplicationFilterChain이다. SecurityFilterChain과는 다르다.
-- DelegatingFilterProxy는 서블릿 필터이다.
-- Spring IOC 컨테이가 관리는 Filter Bean을 갖고 있고, Filter Bean은 FilterChainProxy이며 이 객체안에서 Security와 관련된 일들이 벌어진다고 생각할 수 있다.
+
+## 서블릿(Servlet)이란? ##
+- 자바 서블릿(Java Servlet)은 웹페이지를 동적으로 생성하는 서버 측 프로그램 혹은 그 사양을 말하며, 흔히 서블릿이라 불린다.
+- 서블릿은 웹 서버의 성능을 향상하기 위해 사용되는 자바 클래스의 일종이다. 
+- 기존에 있던 서버는 정적인자료(HTML, 사진, 글 등)만을 주고받았다.
+- 하지만 요청사항이 많아지면서 동적인 페이지들을 만들 필요가 생겼다. 이를 위해 만들어진 것이 바로 서블릿이다.
+
+## Servlet Container란? ##
+- 서블릿이 스스로 작동하는 것이 아니라, 서블릿을 작동할 수 있게 관리 해주는 역할을 하는 것이 바로 서블릿 컨테이너이다.
+- 서블릿 컨테이너는 Clinet의 Request와 Response를 처리할 수 있게 웹 서버와 소켓을 만들어 통신한다.
+- 대표적으로 Tomcat(톰캣)이 있다.
+
+## Filter란? ##
+- Servlet Container의 Filter는 Servlet으로 가기 전에 먼저 적용된다.
+- Filter들은 여러개가 연결되어 있고, 그 여러개의 filter를 Filter chain이라 부른다.(아래이미지참고)
+- 모든 Request들은 Filter chain을 거쳐야지 Servlet에 도착하게 된다.
 
 ![images_yaho1024_post_0dc7723f-7e9e-4255-aff3-c1d3714a277a_delegatingfilterproxy](https://user-images.githubusercontent.com/24876345/231084021-9a61dab5-a14f-415c-b370-3470ed4273f6.png)
 
+## DelegatingFilterProxy ##
+- Spring Security는 DelegatingFilterProxy 라는 필터를 만들어 메인 Filter Chain에 끼워넣고, 그 아래 다시 SecurityFilterChain 그룹을 등록한다.
 
 
 ## Legacy Security Config ##
@@ -115,7 +126,6 @@ http.csrf().disable()
 - 현재 Spring Boot 2.6.7 기준 Spring Security 5.6.3 을 사용하고 있다
 - 하지만 추후 5.7.X 부터 WebSecurityConfigurerAdapter 가 Deprecate 될 예정이다.
 - [Spring Blog, Spring Security without the WebSecurityConfigurerAdapter](https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter) 에서 확인 가능하다.
-
 
 
 ---------------------------------------------------------------------------------------------
