@@ -22,14 +22,14 @@
 ![images_yaho1024_post_0dc7723f-7e9e-4255-aff3-c1d3714a277a_delegatingfilterproxy](https://user-images.githubusercontent.com/24876345/231084021-9a61dab5-a14f-415c-b370-3470ed4273f6.png)
 
 ## DelegatingFilterProxy ##
-- Spring Security는 DelegatingFilterProxy 라는 필터를 만들어 Filter Chain에 끼워넣고, 그 아래 다시 SecurityFilterChain 그룹을 등록한다. (아래그림)
-- 그 이유는 Client의 요청은 Servlet Filter 통해 Servlet으로 들어온다. 
-- 이렇게되면 Servlet 스펙이기 때문에 스프링에서 정의 된 빈을 주입받아 사용할 수 없다.
-- 그래서 DelegatingFiterProxy의 내부에 FilterChainProxy라는 위임 대상을 가지고 있는데 FilterChainProxy는 SpringSecurity에서 제공되는 특수 필터로 SpringSecurityFilterChain이라는 이름 가진 Bean을 호출하여 SercurityFilter를 수행하게 된다.
-- 결국 DelegatingFiterProxy은 Servlet Container와 Spring의 IOC Container를 연결해주는 다리 역할을 하는 필터이다.
+- Client의 요청은 Servlet Filter 통해 Servlet으로 들어온다. 하지만 Spring Security의 인증 및 권한요청은 Spring Container에서 생성되고 관리되어진다.
+- 말그대로 filter는 Sevlet Container에서 관리되고, Spring Security는 Spring Container에서 관리되기때문에 Client의 요청을 Servlet에서 Spring Container로 위임을 해야한다.
+- 그 역할을 DelegatingFiterProxy가 한다. Servlet Container와 Spring의 IOC Container를 연결해주는 다리 역할을 하는 필터이다.
+- DelegatingFiterProxy 내부에 FilterChainProxy 통해 SpringSecurityFilterChain이라는 이름 가진 Bean을 호출하여 SercurityFilter를 수행하게 된다.
+
 
 ![111](https://user-images.githubusercontent.com/24876345/231615293-57500d5c-022b-411c-8902-dad305745816.png)
-
+- Spring Security는 DelegatingFilterProxy 라는 필터를 만들어 Filter Chain에 사이에 생성하고, 그 아래 다시 SecurityFilterChain 그룹을 등록한다.
 
 
 ## Legacy Security Config ##
