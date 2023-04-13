@@ -2,6 +2,9 @@
 :leaves: Spring-Security 안전하게 사용하기
 - Spring-Security는 필터의 생명주기를 이용해서 인증과 권한 작업을 수행한다.
 
+<!-- 사용할수있을것 같아서 두었다.
+![images_yaho1024_post_0dc7723f-7e9e-4255-aff3-c1d3714a277a_delegatingfilterproxy](https://user-images.githubusercontent.com/24876345/231084021-9a61dab5-a14f-415c-b370-3470ed4273f6.png)
+-->
 
 ## 서블릿(Servlet)이란? ##
 - 자바 서블릿(Java Servlet)은 웹페이지를 동적으로 생성하는 서버 측 프로그램 혹은 그 사양을 말하며, 흔히 서블릿이라 불린다.
@@ -19,7 +22,8 @@
 - Filter들은 여러개가 연결되어 있고, 그 여러개의 filter를 Filter chain이라 부른다.(아래이미지참고)
 - 모든 Request들은 Filter chain을 거쳐야지 Servlet에 도착하게 된다.
 
-![images_yaho1024_post_0dc7723f-7e9e-4255-aff3-c1d3714a277a_delegatingfilterproxy](https://user-images.githubusercontent.com/24876345/231084021-9a61dab5-a14f-415c-b370-3470ed4273f6.png)
+![1](https://user-images.githubusercontent.com/24876345/231624185-8a7dc1ce-6639-4f0f-b47e-a296879af749.png)
+
 
 ## DelegatingFilterProxy ##
 - Client의 요청은 Servlet Filter 통해 Servlet으로 들어온다. 하지만 Spring Security의 인증 및 권한요청은 Spring Container에서 생성되고 관리되어진다.
