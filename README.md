@@ -1,31 +1,33 @@
 # Spring-Security
 :leaves: Spring-Security 안전하게 사용하기
 - Spring-Security는 필터의 생명주기를 이용해서 인증과 권한 작업을 수행한다.
+- 스프링 시큐리티를 알아보기전에 몇가지 스프링에 관한 기본적이지만 중요한 내용 혹은 용어를 간단하게 알고 가는게 좋다.
 
-<!-- 사용할수있을것 같아서 두었다.
-![images_yaho1024_post_0dc7723f-7e9e-4255-aff3-c1d3714a277a_delegatingfilterproxy](https://user-images.githubusercontent.com/24876345/231084021-9a61dab5-a14f-415c-b370-3470ed4273f6.png)
--->
+## 필수적으로 알아야 되는 용어 ##
+- 기본적으로 알고는 있지만, 다시 상기시켜서 알아보는게 좋을 것 같다.
 
-## 서블릿(Servlet)이란? ##
+### 1. 서블릿(Servlet)이란? ###
 - 자바 서블릿(Java Servlet)은 웹페이지를 동적으로 생성하는 서버 측 프로그램 혹은 그 사양을 말하며, 흔히 서블릿이라 불린다.
 - 서블릿은 웹 서버의 성능을 향상하기 위해 사용되는 자바 클래스의 일종이다. 
 - 기존에 있던 서버는 정적인자료(HTML, 사진, 글 등)만을 주고받았다.
 - 하지만 요청사항이 많아지면서 동적인 페이지들을 만들 필요가 생겼다. 이를 위해 만들어진 것이 바로 서블릿이다.
 
-## Servlet Container란? ##
+### 2. Servlet Container란? ###
 - 서블릿은 스스로 작동하는 것이 아니라, 서블릿을 작동할 수 있게 관리 해주는 역할을 하는 것이 바로 서블릿 컨테이너이다.
 - 서블릿 컨테이너는 Clinet의 Request와 Response를 처리할 수 있게 웹 서버와 소켓을 만들어 통신한다.
 - 대표적으로 Tomcat(톰캣)이 있다.
 
-## Filter란? ##
+### 3. Filter란? ###
 - Servlet Container의 Filter는 Servlet으로 가기 전에 먼저 적용된다.
 - Filter들은 여러개가 연결되어 있고, 그 여러개의 filter를 Filter chain이라 부른다.(아래이미지참고)
 - 모든 Request들은 Filter chain을 거쳐야지 Servlet에 도착하게 된다.
 
 ![1](https://user-images.githubusercontent.com/24876345/231624185-8a7dc1ce-6639-4f0f-b47e-a296879af749.png)
 
+## Spring Security에서 핵심적인 클래스 ##
+- 한번에 공부하기엔 너무 방대하므로 핵심적인 클래스의 역할과 기능에 대해 먼저 알아두는게 좋을 것 같다.
 
-## DelegatingFilterProxy ##
+### 1. DelegatingFilterProxy ###
 - Client의 요청은 Servlet Filter 통해 Servlet으로 들어온다. 하지만 Spring Security의 인증 및 권한요청은 Spring Container에서 생성되고 관리되어진다.
 - 말그대로 filter는 Sevlet Container에서 관리되고, Spring Security는 Spring Container에서 관리되기때문에 Client의 요청을 Servlet에서 Spring Container로 위임을 해야한다.
 - 그 역할을 DelegatingFiterProxy가 한다. Servlet Container와 Spring의 IOC Container를 연결해주는 다리 역할을 하는 필터이다.
@@ -35,8 +37,15 @@
 ![111](https://user-images.githubusercontent.com/24876345/231615293-57500d5c-022b-411c-8902-dad305745816.png)
 - Spring Security는 DelegatingFilterProxy 라는 필터를 만들어 Filter Chain에 사이에 생성하고, 그 아래 다시 SecurityFilterChain 그룹을 등록한다.
 
+<!-- 사용할수있을것 같아서 두었다.
+![images_yaho1024_post_0dc7723f-7e9e-4255-aff3-c1d3714a277a_delegatingfilterproxy](https://user-images.githubusercontent.com/24876345/231084021-9a61dab5-a14f-415c-b370-3470ed4273f6.png)
+-->
 
-## Legacy Security Config ##
+
+## Spring Security Config ##
+- 스프링 시큐리티 설정
+
+### Legacy Security Config ###
 - 기존에 많이 사용하던 Security Config에는 문제점이 몇가지 있다.
 1. [@EnableWebSecurity](#1-EnableWebSecurity)
     + Springboot에서는 자동으로 생성됨 @EnableWebSecurity 추가할 필요없음.
@@ -78,7 +87,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ````
 
-### 1. EnableWebSecurity ###
+#### 1. EnableWebSecurity ####
 - 간혹 @EnableWebSecurity를 추가하는 경우가 있다. 
 - 만약 Spring Boot 를 사용하고 있디면
 - SecurityAutoConfiguration에서 import 되는 WebSecurityEnablerConfiguration에 의해 자동으로 세팅 된다.
@@ -94,7 +103,7 @@ class WebSecurityEnablerConfiguration {
 }
 ````
 
-### 2. ant pattern을 이용한 ignore처리 권장되지 않음 ###
+#### 2. ant pattern을 이용한 ignore처리 권장되지 않음 ####
 - 해당 설정으로 실행시 하단과 같은 WARN 로그가 발생한다.
 
 ````
@@ -115,7 +124,7 @@ web.ignoring() 은 Spring Security 가 해당 엔드포인트에 보안 헤더 �
 Resource 용 SecurityFilterChain 을 추가하는 방법을 제시하였다.
 ````
 
-### 3. Indent 문제 ###
+#### 3. Indent 문제 ####
 - 현재 설정의 경우 Configurer 에 disable() 를 호출하지 않을 경우 체이닝을 위해 and() 를 호출해야 한다.
 - 또한 가독성을 위해 들여쓰기를 하고 있지만 명확히 구분되지 않아 작성하는 사람마다 다르게 할 여지가 있다.
 
@@ -133,7 +142,7 @@ http.csrf().disable()
       .logoutUrl("/user/logout");
 ````
 
-### 4. WebSecurityConfigurerAdapter Deprecate ###
+#### 4. WebSecurityConfigurerAdapter Deprecate ####
 - 현재 Spring Boot 2.6.7 기준 Spring Security 5.6.3 을 사용하고 있다
 - 하지만 추후 5.7.X 부터 WebSecurityConfigurerAdapter 가 Deprecate 될 예정이다.
 - [Spring Blog, Spring Security without the WebSecurityConfigurerAdapter](https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter) 에서 확인 가능하다.
