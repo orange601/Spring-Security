@@ -4,7 +4,7 @@
 - 스프링 시큐리티를 알아보기전에 몇가지 스프링에 관한 기본적이지만 중요한 내용 혹은 용어를 간단하게 알고 가는게 좋다.
 
 ## 필수적으로 알아야 되는 용어 ##
-- 기본적으로 알고는 있지만, 다시 상기시켜서 알아보는게 좋을 것 같다.
+- 기본적으로 알고는 있지만, 다시 상기시켜서 알아보자.
 
 ### 1. 서블릿(Servlet)이란? ###
 - 자바 서블릿(Java Servlet)은 웹페이지를 동적으로 생성하는 서버 측 프로그램 혹은 그 사양을 말하며, 흔히 서블릿이라 불린다.
@@ -36,6 +36,44 @@
 
 ![111](https://user-images.githubusercontent.com/24876345/231615293-57500d5c-022b-411c-8902-dad305745816.png)
 - Spring Security는 DelegatingFilterProxy 라는 필터를 만들어 Filter Chain에 사이에 생성하고, 그 아래 다시 SecurityFilterChain 그룹을 등록한다.
+
+````java
+// DelegatingFilterProxy 클래스
+public class DelegatingFilterProxy extends GenericFilterBean {
+	...
+	
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+
+		// Lazily initialize the delegate if necessary.
+		Filter delegateToUse = this.delegate;
+		if (delegateToUse == null) {
+			synchronized (this.delegateMonitor) {
+				delegateToUse = this.delegate;
+				if (delegateToUse == null) {
+					WebApplicationContext wac = findWebApplicationContext();
+					if (wac == null) {
+						throw new IllegalStateException("No WebApplicationContext found: " +
+								"no ContextLoaderListener or DispatcherServlet registered?");
+					}
+					delegateToUse = initDelegate(wac);
+				}
+				this.delegate = delegateToUse;
+			}
+		}
+
+		// Let the delegate perform the actual doFilter operation.
+		invokeDelegate(delegateToUse, request, response, filterChain);
+	}
+	
+	protected void invokeDelegate(
+			Filter delegate, ServletRequest request, ServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+
+		delegate.doFilter(request, response, filterChain);
+	}
+````
 
 <!-- 사용할수있을것 같아서 두었다.
 ![images_yaho1024_post_0dc7723f-7e9e-4255-aff3-c1d3714a277a_delegatingfilterproxy](https://user-images.githubusercontent.com/24876345/231084021-9a61dab5-a14f-415c-b370-3470ed4273f6.png)
